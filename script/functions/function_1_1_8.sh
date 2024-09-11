@@ -8,7 +8,7 @@ ensure_audit_containerd_sock() {
     local rule_containerd_sock="-w /run/containerd/containerd.sock -p wa -k docker"
 
     # Check if the audit rule is already present
-    if grep -q "$rule_containerd_sock" "$audit_rules_file"; then
+    if grep -q -- "$rule_containerd_sock" "$audit_rules_file"; then
         echo "Audit rule for containerd.sock is already configured."
     else
         echo "NOTE: Audit rule for containerd.sock is not configured. You need to add the following rule to $audit_rules_file:"

@@ -7,7 +7,7 @@ check_docker_audit() {
     echo "Checking if auditing is configured for Docker daemon..."
 
     # Check current audit rules
-    if auditctl -l | grep -q "$audit_rule"; then
+    if auditctl -l | grep -q -- "$audit_rule"; then
         echo "Auditing is configured for Docker daemon."
         return 0
     else

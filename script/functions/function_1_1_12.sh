@@ -8,7 +8,7 @@ ensure_audit_containerd_config() {
     local rule_containerd_config="-w /etc/containerd/config.toml -p wa -k docker"
 
     # Check if the audit rule is already present
-    if grep -q "$rule_containerd_config" "$audit_rules_file"; then
+    if grep -q -- "$rule_containerd_config" "$audit_rules_file"; then
         echo "Audit rule for /etc/containerd/config.toml is already configured."
     else
         echo "NOTE: Audit rule for /etc/containerd/config.toml is not configured. You need to add the following rule to $audit_rules_file:"

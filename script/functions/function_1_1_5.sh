@@ -10,7 +10,7 @@ ensure_audit_docker_directory() {
     local rule_exclude_overlay="-a never,exit -F dir=/var/lib/docker/overlay2"
 
     # Check if the audit rules are already present
-    if grep -q "$rule_docker_dir" "$audit_rules_file"; then
+    if grep -q -- "$rule_docker_dir" "$audit_rules_file"; then
         echo "Audit rule for /var/lib/docker is already configured."
     else
         echo "NOTE: Audit rule for /var/lib/docker is not configured. You need to add the following rule to $audit_rules_file:"
@@ -18,7 +18,7 @@ ensure_audit_docker_directory() {
         echo "After adding rule, restart Audit Daemon with: sudo systemctl restart auditd"
     fi
 
-    if grep -q "$rule_exclude_volumes" "$audit_rules_file"; then
+    if grep -q -- "$rule_exclude_volumes" "$audit_rules_file"; then
         echo "Exclusion rule for /var/lib/docker/volumes is already configured."
     else
         echo "NOTE: Exclusion rule for /var/lib/docker/volumes is not configured. You need to add the following rule to $audit_rules_file:"
@@ -26,7 +26,7 @@ ensure_audit_docker_directory() {
         echo "After adding rule, restart Audit Daemon with: sudo systemctl restart auditd"
     fi
 
-    if grep -q "$rule_exclude_overlay" "$audit_rules_file"; then
+    if grep -q -- "$rule_exclude_overlay" "$audit_rules_file"; then
         echo "Exclusion rule for /var/lib/docker/overlay2 is already configured."
     else
         echo "NOTE: Exclusion rule for /var/lib/docker/overlay2 is not configured. You need to add the following rule to $audit_rules_file:"

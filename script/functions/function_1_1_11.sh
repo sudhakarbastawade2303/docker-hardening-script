@@ -8,7 +8,7 @@ ensure_audit_daemon_json() {
     local rule_daemon_json="-w /etc/docker/daemon.json -p wa -k docker"
 
     # Check if the audit rule is already present
-    if grep -q "$rule_daemon_json" "$audit_rules_file"; then
+    if grep -q -- "$rule_daemon_json" "$audit_rules_file"; then
         echo "Audit rule for /etc/docker/daemon.json is already configured."
     else
         echo "NOTE: Audit rule for /etc/docker/daemon.json is not configured. You need to add the following rule to $audit_rules_file:"

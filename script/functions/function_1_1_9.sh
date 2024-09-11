@@ -8,7 +8,7 @@ ensure_audit_docker_sock() {
     local rule_docker_sock="-w /var/run/docker.sock -p wa -k docker"
 
     # Check if the audit rule is already present
-    if grep -q "$rule_docker_sock" "$audit_rules_file"; then
+    if grep -q -- "$rule_docker_sock" "$audit_rules_file"; then
         echo "Audit rule for docker.sock is already configured."
     else
         echo "NOTE: Audit rule for docker.sock is not configured. You need to add the following rule to $audit_rules_file:"

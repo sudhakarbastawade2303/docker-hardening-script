@@ -8,7 +8,7 @@ ensure_audit_sysconfig_docker() {
     local rule_sysconfig_docker="-w /etc/sysconfig/docker -p wa -k docker"
 
     # Check if the audit rule is already present
-    if grep -q "$rule_sysconfig_docker" "$audit_rules_file"; then
+    if grep -q -- "$rule_sysconfig_docker" "$audit_rules_file"; then
         echo "Audit rule for /etc/sysconfig/docker is already configured."
     else
         echo "NOTE: Audit rule for /etc/sysconfig/docker is not configured. You need to add the following rule to $audit_rules_file:"

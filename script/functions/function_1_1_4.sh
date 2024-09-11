@@ -8,7 +8,7 @@ check_audit_rule() {
     echo "Checking if auditing is configured for $path..."
 
     # Check if the audit rule exists
-    if auditctl -l | grep -q "$rule"; then
+    if auditctl -l | grep -q -- "$rule"; then
         echo "Auditing is configured for $path."
     else
         echo "Auditing is NOT configured for $path."
