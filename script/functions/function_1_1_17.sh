@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Function to ensure auditing is configured for /usr/bin/containerd-shim-runc-v2 file
+ensure_audit_containerd_shim_runc_v2() {
+    local audit_rules_file="/etc/audit/rules.d/audit.rules"
+    
+    # Audit rule line for /usr/bin/containerd-shim-runc-v2 file
+    local rule_containerd_shim_runc_v2="-w /usr/bin/containerd-shim-runc-v2 -p x -k docker"
+
+    # Check if the audit rule is already present
+    if grep -q -- "$rule_containerd_shim_runc_v2" "$audit_rules_file"; then
+        echo "Audit rule for /usr/bin/containerd-shim-runc-v2 is already configured."
+    else
+        echo "NOTE: Audit rule for /usr/bin/containerd-shim-runc-v2 is not configured."
+        echo "To configure the audit rule, add the following line to $audit_rules_file:"
+        echo "$rule_containerd_shim_runc_v2"
+        echo "After adding the rule, restart the audit daemon with:"
+        echo "systemctl restart auditd"
+    fi
+}
+
+# Run the function
+ensure_audit_containerd_shim_runc_v2
