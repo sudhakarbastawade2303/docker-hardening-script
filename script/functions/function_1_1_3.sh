@@ -1,11 +1,25 @@
 #!/bin/bash
-# Function to check "Ensure auditing is configured for the Docker daemon"
-echo "Checking 1.1.3: Ensure auditing is configured for the Docker daemon"
-# Verify that auditing rules for Docker are in place
-auditctl -l | grep -E "/usr/bin/dockerd" &> /dev/null
-if [ $? -eq 0 ]; then
-  echo "Pass: Auditing is configured for the Docker daemon."
-else
-  echo "Fail: Auditing is not configured for the Docker daemon."
-fi
+
+# Function to check if auditing is configured for Docker daemon
+check_docker_audit() {
+    audit_rule="-w /usr/bin/dockerd -k docker"
+
+    echo "Checking if auditing is configured for Docker daemon..."
+
+    # Check current audit rules
+    if auditctl -l | grep -q "$audit_rule"; then
+        echo "Auditing is configured for Docker daemon."
+        return 0
+    else
+        echo "Auditing is NOT configured for Docker daemon."
+        echo "NOTE: To configure auditing, add the following rule to your audit rules file:"
+        echo "Add the following line to /etc/audit/rules.d/audit.rules (for systems using auditd)"
+        echo "$audit_rule"
+        echo "Then restart the audit daemon with: sudo systemctl restart auditd"
+        return 1
+    fi
+}
+
+# Call the function
+check_docker_audit
 
