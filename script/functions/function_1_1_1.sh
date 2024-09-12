@@ -12,6 +12,9 @@ check_separate_partition_for_docker() {
     fi
 }
 
+# Main execution
+check_separate_partition_for_docker
+
 << '###'
 # Create a separate LVM partition for Docker
 create_lvm_for_docker() {
