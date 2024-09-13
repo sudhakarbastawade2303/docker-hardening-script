@@ -9,13 +9,15 @@ ensure_audit_containerd_shim_runc_v1() {
 
     # Check if the audit rule is already present
     if grep -q -- "$rule_containerd_shim_runc_v1" "$audit_rules_file"; then
-        echo "Audit rule for /usr/bin/containerd-shim-runc-v1 is already configured."
+        echo "PASS: Audit rule for /usr/bin/containerd-shim-runc-v1 is already configured."
+        return 0
     else
-        echo "NOTE: Audit rule for /usr/bin/containerd-shim-runc-v1 is not configured."
+        echo "FAIL: Audit rule for /usr/bin/containerd-shim-runc-v1 is not configured."
         echo "To manually configure the audit rule, add the following line to $audit_rules_file:"
         echo "$rule_containerd_shim_runc_v1"
         echo "After adding the rule, restart the audit daemon with:"
         echo "systemctl restart auditd"
+        return 1
     fi
 }
 

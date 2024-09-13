@@ -9,14 +9,16 @@ ensure_audit_docker_service() {
 
     # Check if the audit rule is already present
     if grep -q -- "$rule_docker_service" "$audit_rules_file"; then
-        echo "Audit rule for docker.service is already configured."
+        echo "PASS: Audit rule for docker.service is already configured."
+        return 0
     else
-        echo "NOTE: Audit rule for docker.service is not configured. You need to add the following rule to $audit_rules_file:"
+        echo "FAIL: Audit rule for docker.service is not configured."
+        echo "NOTE: You need to add the following rule to $audit_rules_file:"
         echo "$rule_docker_service"
-        echo "After adding rule, restart Audit Daemon with: sudo systemctl restart auditd"
+        echo "After adding the rule, restart the Audit Daemon with: sudo systemctl restart auditd"
+        return 1
     fi
 }
 
 # Run the function
 ensure_audit_docker_service
-

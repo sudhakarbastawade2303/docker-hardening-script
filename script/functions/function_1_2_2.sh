@@ -6,7 +6,9 @@ docker_version=$(docker --version | awk '{print $3}' | sed 's/,//')
 latest_version="<latest_version>" # Replace with the latest version number
 if [ "$docker_version" == "$latest_version" ]; then
   echo "Pass: Docker is up to date ($docker_version)."
+  return 0
 else
   echo "Fail: Docker is not up to date. Current version: $docker_version, Expected: $latest_version."
+  return 1
 fi
 

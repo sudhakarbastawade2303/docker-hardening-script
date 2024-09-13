@@ -4,6 +4,31 @@
 check_separate_partition_for_docker() {
     echo "Checking if a separate partition for /var/lib/docker exists..."
 
+    # Use mountpoint command to check if /var/lib/docker is a mount point
+    if mountpoint -q /var/lib/docker; then
+        echo "PASS: A separate partition for /var/lib/docker already exists."
+        return 0  # Indicate success
+    else
+        echo "FAIL: No separate partition for /var/lib/docker found."
+        echo "NOTE: Consider setting up a separate LVM partition for /var/lib/docker for better isolation and management."
+        return 1  # Indicate failure
+    fi
+}
+
+# Main execution
+check_separate_partition_for_docker
+
+
+
+
+
+>>'###'
+#!/bin/bash
+
+# Check if a separate partition for Docker containers exists
+check_separate_partition_for_docker() {
+    echo "Checking if a separate partition for /var/lib/docker exists..."
+
     if mountpoint -q /var/lib/docker; then
         echo "PASS: A separate partition for /var/lib/docker already exists."
         return 0
@@ -14,6 +39,7 @@ check_separate_partition_for_docker() {
 
 # Main execution
 check_separate_partition_for_docker
+###
 
 << '###'
 # Create a separate LVM partition for Docker
