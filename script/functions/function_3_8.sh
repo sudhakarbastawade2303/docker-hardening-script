@@ -18,7 +18,7 @@ if [[ -d "$CERT_DIR_PATH" ]]; then
     # Check if there are any certificate files
     if [[ -z "$cert_files" ]]; then
         echo "No certificate files found in $CERT_DIR_PATH."
-        exit 0
+        return 0
     else
         # Process each certificate file
         for cert_file in $cert_files; do
@@ -49,4 +49,4 @@ else
     status=1
 fi
 
-exit $status
+return $status

@@ -24,5 +24,5 @@ else
     STATUS=0
 fi
 
-# Exit with the status code
-exit $STATUS
+# Return with the status code instead of exiting
+return $STATUS

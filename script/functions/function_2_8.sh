@@ -30,4 +30,4 @@ check_ulimit "Maximum number of open files (nofile)" "$current_nofile" "$desired
 check_ulimit "Maximum number of processes (nproc)" "$current_nproc" "$desired_nproc"
 
 # Exit with the status code
-exit $status
+return $status

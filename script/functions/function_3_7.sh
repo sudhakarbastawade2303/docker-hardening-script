@@ -46,9 +46,9 @@ if [[ -d "$CERT_DIR_PATH" ]]; then
             fi
         done
 
-        exit $status
+        return $status
     fi
 else
     echo "FAIL: The directory $CERT_DIR_PATH does not exist. No action taken."
-    exit 1
+    return 1
 fi

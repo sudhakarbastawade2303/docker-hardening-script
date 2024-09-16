@@ -28,4 +28,4 @@ check_user_namespace() {
 check_user_namespace
 
 # Exit with the status code returned by the function
-exit $?
+return $?

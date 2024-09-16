@@ -14,24 +14,22 @@ if [[ -f "$SERVICE_FILE_PATH" ]]; then
     # Check if the current ownership matches the desired ownership
     if [[ "$current_owner" == "$desired_owner" ]]; then
         echo "PASS: The ownership of $SERVICE_FILE_PATH is correctly set to $desired_owner."
-        exit 0
+        return 0
     else
         echo "FAIL: The ownership of $SERVICE_FILE_PATH is incorrect. Current ownership is $current_owner."
-        exit 1
-
         # Correct the ownership
-       # echo "Changing ownership of $SERVICE_FILE_PATH to $desired_owner..."
-        #sudo chown root:root "$SERVICE_FILE_PATH"
+        echo "Changing ownership of $SERVICE_FILE_PATH to $desired_owner..."
+        sudo chown root:root "$SERVICE_FILE_PATH"
 
-      #  if [[ $? -eq 0 ]]; then
-       #     echo "PASS: Ownership of $SERVICE_FILE_PATH successfully changed to $desired_owner."
-       #     exit 0
-       # else
-      #      echo "ERROR: Failed to change ownership of $SERVICE_FILE_PATH."
-      #      exit 1
-      #  fi
+        if [[ $? -eq 0 ]]; then
+            echo "PASS: Ownership of $SERVICE_FILE_PATH successfully changed to $desired_owner."
+            return 0
+        else
+            echo "ERROR: Failed to change ownership of $SERVICE_FILE_PATH."
+            return 1
+        fi
     fi
 else
     echo "FAIL: The file $SERVICE_FILE_PATH does not exist. No action taken."
-    exit 1
+    return 1
 fi

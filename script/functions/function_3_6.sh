@@ -14,10 +14,10 @@ if [[ -d "$DOCKER_DIR_PATH" ]]; then
     # Check if the current permissions are more restrictive or equal to the desired permissions
     if [[ "$current_permissions" -le "$desired_permissions" ]]; then
         echo "PASS: The permissions of $DOCKER_DIR_PATH are correctly set to $current_permissions or more restrictive."
-        exit 0
+        return 0
     else
         echo "FAIL: The permissions of $DOCKER_DIR_PATH are too permissive. Current permissions are $current_permissions."
-        exit 1
+        return 1
 
         # # Correct the permissions
         # echo "Changing permissions of $DOCKER_DIR_PATH to $desired_permissions..."
@@ -25,13 +25,13 @@ if [[ -d "$DOCKER_DIR_PATH" ]]; then
 
         # if [[ $? -eq 0 ]]; then
         #     echo "Permissions of $DOCKER_DIR_PATH successfully changed to $desired_permissions."
-        #     exit 0
+        #     return 0
         # else
         #     echo "ERROR: Failed to change permissions of $DOCKER_DIR_PATH."
-        #     exit 1
+        #     return 1
         # fi
     fi
 else
     echo "FAIL: The directory $DOCKER_DIR_PATH does not exist. No action taken."
-    exit 1
+    return 1
 fi

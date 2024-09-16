@@ -14,10 +14,10 @@ if [[ -f "$SERVICE_FILE_PATH" ]]; then
     # Check if the current permissions match the desired permissions
     if [[ "$current_permissions" == "$desired_permissions" ]]; then
         echo "PASS: The permissions of $SERVICE_FILE_PATH are correctly set to $desired_permissions."
-        exit 0
+        return 0
     else
         echo "FAIL: The permissions of $SERVICE_FILE_PATH are incorrect. Current permissions are $current_permissions."
-        exit 1
+        return 1
 
         # Correct the permissions
         #echo "Changing permissions of $SERVICE_FILE_PATH to $desired_permissions..."
@@ -25,13 +25,13 @@ if [[ -f "$SERVICE_FILE_PATH" ]]; then
 
         #if [[ $? -eq 0 ]]; then
         #    echo "Permissions of $SERVICE_FILE_PATH successfully changed to $desired_permissions."
-        #    exit 0
+        #    return 0
         #else
           #  echo "ERROR: Failed to change permissions of $SERVICE_FILE_PATH."
-          #  exit 1
+          #  return 1
        # fi
     fi
 else
     echo "FAIL: The file $SERVICE_FILE_PATH does not exist. No action taken."
-    exit 1
+    return 1
 fi
