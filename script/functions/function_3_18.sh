@@ -6,6 +6,9 @@ DAEMON_JSON_PATH="/etc/docker/daemon.json"  # Replace with the actual path if di
 # Desired permissions
 desired_permissions="644"
 
+# Initialize a status flag
+status=0
+
 # Check if the daemon.json file exists
 if [[ -f "$DAEMON_JSON_PATH" ]]; then
     # Get the current permissions of the file
@@ -13,20 +16,24 @@ if [[ -f "$DAEMON_JSON_PATH" ]]; then
 
     # Check if the current permissions are more restrictive or equal to the desired permissions
     if [[ "$current_permissions" -le "$desired_permissions" ]]; then
-        echo "The permissions of $DAEMON_JSON_PATH are correctly set to $current_permissions or more restrictive."
+        echo "PASS: The permissions of $DAEMON_JSON_PATH are correctly set to $current_permissions or more restrictive."
     else
-        echo "NOTE: The permissions of $DAEMON_JSON_PATH are too permissive. Current permissions are $current_permissions."
+        echo "FAIL: The permissions of $DAEMON_JSON_PATH are too permissive. Current permissions are $current_permissions."
+        status=1
+        # # Correct the permissions
+        # echo "Changing permissions of $DAEMON_JSON_PATH to $desired_permissions..."
+        # sudo chmod $desired_permissions "$DAEMON_JSON_PATH"
 
-        # Correct the permissions
-        echo "Changing permissions of $DAEMON_JSON_PATH to $desired_permissions..."
-        sudo chmod $desired_permissions "$DAEMON_JSON_PATH"
-
-        if [[ $? -eq 0 ]]; then
-            echo "Permissions of $DAEMON_JSON_PATH successfully changed to $desired_permissions."
-        else
-            echo "ERROR: Failed to change permissions of $DAEMON_JSON_PATH."
-        fi
+        # if [[ $? -eq 0 ]]; then
+        #     echo "Permissions of $DAEMON_JSON_PATH successfully changed to $desired_permissions."
+        # else
+        #     echo "ERROR: Failed to change permissions of $DAEMON_JSON_PATH."
+        #     status=1
+        # fi
     fi
 else
-    echo "The daemon.json file $DAEMON_JSON_PATH does not exist. No action taken."
+    echo "FAIL: The daemon.json file $DAEMON_JSON_PATH does not exist. No action taken."
+    status=1
 fi
+
+exit $status

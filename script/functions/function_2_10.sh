@@ -8,12 +8,15 @@ check_cgroup_usage() {
     if [[ -f "$config_file" ]]; then
         # Look for the cgroup-driver option in the Docker config file
         if grep -q '"cgroup-driver"' "$config_file"; then
-            echo "Default cgroup driver is configured."
+            echo "PASS: Default cgroup driver is configured."
+            return 0
         else
-            echo "NOTE: Default cgroup driver is NOT configured in $config_file."
+            echo "FAIL: Default cgroup driver is NOT configured in $config_file."
+            return 1
         fi
     else
-        echo "NOTE: Docker configuration file $config_file does not exist."
+        echo "FAIL: Docker configuration file $config_file does not exist."
+        return 1
     fi
 }
 

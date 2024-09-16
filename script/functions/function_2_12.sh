@@ -9,12 +9,15 @@ check_docker_auth_config_file() {
     if [[ -f "$config_file" ]]; then
         # Look for the authorization-plugins key in the Docker config file
         if grep -q "$auth_plugin_key" "$config_file"; then
-            echo "Docker client command authorization is configured in $config_file."
+            echo "PASS: Docker client command authorization is configured in $config_file."
+            return 0
         else
-            echo "NOTE: Docker client command authorization is NOT configured in $config_file."
+            echo "FAIL: Docker client command authorization is NOT configured in $config_file."
+            return 1
         fi
     else
-        echo "NOTE: Docker configuration file $config_file does not exist."
+        echo "FAIL: Docker configuration file $config_file does not exist."
+        return 1
     fi
 }
 
@@ -24,17 +27,19 @@ check_docker_auth_command_line() {
     local docker_pid=$(pgrep -f dockerd)
     
     if [[ -z "$docker_pid" ]]; then
-        echo "NOTE: Docker daemon is not running or could not be found."
-        return
+        echo "FAIL: Docker daemon is not running or could not be found."
+        return 1
     fi
 
     # Check the command line arguments of the Docker daemon process
     local auth_plugins=$(ps -ef | grep "[d]ockerd" | grep -oP '(?<=--authorization-plugins=)[^ ]+')
 
     if [[ -n "$auth_plugins" ]]; then
-        echo "Docker client command authorization is enabled via command line: $auth_plugins"
+        echo "PASS: Docker client command authorization is enabled via command line: $auth_plugins"
+        return 0
     else
-        echo "NOTE: Docker client command authorization is NOT configured in the Docker daemon command line."
+        echo "FAIL: Docker client command authorization is NOT configured in the Docker daemon command line."
+        return 1
     fi
 }
 

@@ -15,7 +15,11 @@ if [[ -d "$CERT_DIR_PATH" ]]; then
     # Check if there are any certificate files
     if [[ -z "$cert_files" ]]; then
         echo "No certificate files found in $CERT_DIR_PATH."
+        exit 0
     else
+        # Initialize a status flag
+        status=0
+
         # Process each certificate file
         for cert_file in $cert_files; do
             # Get the current ownership of the file
@@ -23,23 +27,28 @@ if [[ -d "$CERT_DIR_PATH" ]]; then
 
             # Check if the current ownership matches the desired ownership
             if [[ "$current_owner" == "$desired_owner" ]]; then
-                echo "The ownership of $cert_file is correctly set to $desired_owner."
+                echo "PASS: The ownership of $cert_file is correctly set to $desired_owner."
             else
-                echo "NOTE: The ownership of $cert_file is incorrect. Current ownership is $current_owner."
+                echo "FAIL: The ownership of $cert_file is incorrect. Current ownership is $current_owner."
+        
+                # Uncomment the following lines to correct the ownership
+                # echo "Changing ownership of $cert_file to $desired_owner..."
+                # sudo chown $desired_owner "$cert_file"
 
-                # Correct the ownership
-                echo "Changing ownership of $cert_file to $desired_owner..."
-                sudo chown $desired_owner "$cert_file"
+                # if [[ $? -eq 0 ]]; then
+                #     echo "Ownership of $cert_file successfully changed to $desired_owner."
+                # else
+                #     echo "ERROR: Failed to change ownership of $cert_file."
+                #     status=1
+                # fi
 
-                if [[ $? -eq 0 ]]; then
-                    echo "Ownership of $cert_file successfully changed to $desired_owner."
-                else
-                    echo "ERROR: Failed to change ownership of $cert_file."
-                fi
+                status=1  # Mark status as failure if any ownership is incorrect
             fi
         done
+
+        exit $status
     fi
 else
-    echo "The directory $CERT_DIR_PATH does not exist. No action taken."
+    echo "FAIL: The directory $CERT_DIR_PATH does not exist. No action taken."
+    exit 1
 fi
-

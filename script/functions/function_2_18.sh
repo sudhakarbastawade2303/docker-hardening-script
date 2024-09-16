@@ -12,17 +12,21 @@ check_experimental_config_file() {
         # Look for experimental option in the Docker config file
         if grep -q "$experimental_option" "$config_file"; then
             if grep -q '"experimental": true' "$config_file"; then
-                echo "NOTE: Experimental features are ENABLED in $config_file."
+                echo "PASS: Experimental features are ENABLED in $config_file."
+                return 0
             else
                 echo "Experimental features are DISABLED in $config_file."
+                return 1
             fi
         else
-            echo "Experimental features are NOT configured in $config_file."
+            echo "FAIL: Experimental features are NOT configured in $config_file."
+            return 1
         fi
     else
-        echo "NOTE: Docker configuration file $config_file does not exist."
+        echo "FAIL: Docker configuration file $config_file does not exist."
+        return 1
     fi
 }
 
-# Call the functions to check experimental features configuration
+# Call the function to check experimental features configuration
 check_experimental_config_file

@@ -13,20 +13,25 @@ if [[ -f "$SERVICE_FILE_PATH" ]]; then
 
     # Check if the current permissions match the desired permissions
     if [[ "$current_permissions" == "$desired_permissions" ]]; then
-        echo "The permissions of $SERVICE_FILE_PATH are correctly set to $desired_permissions."
+        echo "PASS: The permissions of $SERVICE_FILE_PATH are correctly set to $desired_permissions."
+        exit 0
     else
-        echo "NOTE: The permissions of $SERVICE_FILE_PATH are incorrect. Current permissions are $current_permissions."
+        echo "FAIL: The permissions of $SERVICE_FILE_PATH are incorrect. Current permissions are $current_permissions."
+        exit 1
 
         # Correct the permissions
-        echo "Changing permissions of $SERVICE_FILE_PATH to $desired_permissions..."
-        sudo chmod $desired_permissions "$SERVICE_FILE_PATH"
+        #echo "Changing permissions of $SERVICE_FILE_PATH to $desired_permissions..."
+        #sudo chmod $desired_permissions "$SERVICE_FILE_PATH"
 
-        if [[ $? -eq 0 ]]; then
-            echo "Permissions of $SERVICE_FILE_PATH successfully changed to $desired_permissions."
-        else
-            echo "ERROR: Failed to change permissions of $SERVICE_FILE_PATH."
-        fi
+        #if [[ $? -eq 0 ]]; then
+        #    echo "Permissions of $SERVICE_FILE_PATH successfully changed to $desired_permissions."
+        #    exit 0
+        #else
+          #  echo "ERROR: Failed to change permissions of $SERVICE_FILE_PATH."
+          #  exit 1
+       # fi
     fi
 else
-    echo "The file $SERVICE_FILE_PATH does not exist. No action taken."
+    echo "FAIL: The file $SERVICE_FILE_PATH does not exist. No action taken."
+    exit 1
 fi

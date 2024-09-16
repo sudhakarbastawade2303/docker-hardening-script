@@ -11,14 +11,16 @@ check_logging_config_file() {
         
         for driver in "${logging_drivers[@]}"; do
             if grep -q "$driver" "$config_file"; then
-                echo "Centralized or remote logging is configured with driver: $driver"
-                return
+                echo "PASS: Centralized or remote logging is configured with driver: $driver"
+                return 0
             fi
         done
         
-        echo "NOTE: Centralized or remote logging is NOT configured in $config_file."
+        echo "FAIL: Centralized or remote logging is NOT configured in $config_file."
+        return 1
     else
-        echo "NOTE: Docker configuration file $config_file does not exist."
+        echo "FAIL: Docker configuration file $config_file does not exist."
+        return 1
     fi
 }
 
@@ -30,8 +32,8 @@ check_logging_command_line() {
     local docker_pid=$(pgrep -f dockerd)
     
     if [[ -z "$docker_pid" ]]; then
-        echo "NOTE: Docker daemon is not running or could not be found."
-        return
+        echo "FAIL: Docker daemon is not running or could not be found."
+        return 1
     fi
 
     echo "Checking Docker logging configuration from command line..."
@@ -39,12 +41,13 @@ check_logging_command_line() {
     # Check the command line arguments of the Docker daemon process
     for driver in "${logging_drivers[@]}"; do
         if ps -ef | grep "[d]ockerd" | grep -q "--log-driver=$driver"; then
-            echo "Centralized or remote logging is enabled with driver: $driver"
-            return
+            echo "PASS: Centralized or remote logging is enabled with driver: $driver"
+            return 0
         fi
     done
     
-    echo "NOTE: Centralized or remote logging is NOT configured in the Docker daemon command line."
+    echo "FAIL: Centralized or remote logging is NOT configured in the Docker daemon command line."
+    return 1
 }
 
 # Call the functions to check logging configuration

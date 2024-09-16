@@ -6,6 +6,9 @@ DEFAULT_DOCKER_PATH="/etc/default/docker"  # Replace with the actual path if dif
 # Desired permissions
 desired_permissions="644"
 
+# Initialize a status flag
+status=0
+
 # Check if the /etc/default/docker file exists
 if [[ -f "$DEFAULT_DOCKER_PATH" ]]; then
     # Get the current permissions of the file
@@ -13,20 +16,24 @@ if [[ -f "$DEFAULT_DOCKER_PATH" ]]; then
 
     # Check if the current permissions are more restrictive or equal to the desired permissions
     if [[ "$current_permissions" -le "$desired_permissions" ]]; then
-        echo "The permissions of $DEFAULT_DOCKER_PATH are correctly set to $current_permissions or more restrictive."
+        echo "PASS: The permissions of $DEFAULT_DOCKER_PATH are correctly set to $current_permissions or more restrictive."
     else
-        echo "NOTE: The permissions of $DEFAULT_DOCKER_PATH are too permissive. Current permissions are $current_permissions."
+        echo "FAIL: The permissions of $DEFAULT_DOCKER_PATH are too permissive. Current permissions are $current_permissions."
 
-        # Correct the permissions
-        echo "Changing permissions of $DEFAULT_DOCKER_PATH to $desired_permissions..."
-        sudo chmod $desired_permissions "$DEFAULT_DOCKER_PATH"
+        # # Correct the permissions
+        # echo "Changing permissions of $DEFAULT_DOCKER_PATH to $desired_permissions..."
+        # sudo chmod $desired_permissions "$DEFAULT_DOCKER_PATH"
 
-        if [[ $? -eq 0 ]]; then
-            echo "Permissions of $DEFAULT_DOCKER_PATH successfully changed to $desired_permissions."
-        else
-            echo "ERROR: Failed to change permissions of $DEFAULT_DOCKER_PATH."
-        fi
+        # if [[ $? -eq 0 ]]; then
+        #     echo "Permissions of $DEFAULT_DOCKER_PATH successfully changed to $desired_permissions."
+        # else
+        #     echo "ERROR: Failed to change permissions of $DEFAULT_DOCKER_PATH."
+        #     status=1
+        # fi
     fi
 else
-    echo "The /etc/default/docker file $DEFAULT_DOCKER_PATH does not exist. No action taken."
+    echo "FAIl: The /etc/default/docker file $DEFAULT_DOCKER_PATH does not exist. No action taken."
+    status=1
 fi
+
+exit $status
