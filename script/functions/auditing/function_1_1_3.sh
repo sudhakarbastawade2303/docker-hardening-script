@@ -2,7 +2,7 @@
 
 # Function to check if auditing is configured for Docker daemon
 check_docker_audit() {
-    audit_rule="-w /usr/bin/dockerd -k docker"
+    audit_rule="-w /usr/bin/dockerd -p wa -k docker"
 
     echo "Checking: Ensure auditing is configured for Docker daemon..."
 

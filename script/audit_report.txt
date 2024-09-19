@@ -1,0 +1,24 @@
+Audit Report
+Audit Date: 2024-09-19 10:10:51
+Server Name: ip-172-31-3-6
+----------------------------------------
+[ SKIPPED ]: 1.1.1 - Ensure a separate partition for containers has been created(manual)
+[ FAIL ]: 1.1.2 - Ensure only trusted users are allowed to control Docker daemon(manual)
+[ PASS ]: 1.1.3 - Ensure Auditing is configured for docker daemon(Automated)
+[ FAIL ]: 1.1.4 - 
+[ FAIL ]: 1.1.5 - 
+[ PASS ]: 1.1.6 - 
+[ FAIL ]: 1.1.7 - 
+[ FAIL ]: 1.1.8 - 
+[ FAIL ]: 1.1.9 - 
+[ PASS ]: 1.1.10 - 
+
+Summary
+--------
+Total Recommendations: 10
+Skipped Recommendations: 1
+Excluded Recommendations: 0
+Passed Recommendations: 3
+Remediated Recommendations: 0
+Manual Recommendations: 0
+Failed Recommendations: 6

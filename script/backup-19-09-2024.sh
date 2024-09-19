@@ -103,7 +103,6 @@ get_control_heading() {
     esac
 }
 
-# Run control function and handle the output
 run_control() {
     local control_number="$1"
     local function_file="$2"
@@ -116,7 +115,7 @@ run_control() {
     if [[ "$report_file" == "$audit_report_file" ]]; then
         if is_excluded "$control_number"; then
             control_status="[ SKIPPED ]"
-            skipped_recommendations=$((skipped_recommendations + 1))
+            excluded_recommendations=$((excluded_recommendations + 1))
         else
             if [[ -f "$function_file" ]]; then
                 echo "Running control $control_number..."
@@ -128,7 +127,7 @@ run_control() {
                     failed_recommendations=$((failed_recommendations + 1))
                 fi
             else
-                control_status="[ FAIL ]"
+                control_status="[ FAIL (Function file not found) ]"
                 failed_recommendations=$((failed_recommendations + 1))
             fi
         fi
@@ -143,7 +142,7 @@ run_control() {
                 manual_recommendations=$((manual_recommendations + 1))
             fi
         else
-            control_status="[ FAIL ]"
+            control_status="[ FAIL (Function file not found) ]"
             manual_recommendations=$((manual_recommendations + 1))
         fi
     fi
@@ -151,7 +150,6 @@ run_control() {
     echo "$control_status: $control_number - $control_heading" >> "$report_file"
 }
 
-# Summary generation for report
 generate_summary() {
     local report_file="$1"
 
@@ -159,8 +157,9 @@ generate_summary() {
     echo "Summary" >> "$report_file"
     echo "--------" >> "$report_file"
     echo "Total Recommendations: $total_recommendations" >> "$report_file"
-    echo "Skipped Recommendations: $skipped_recommendations" >> "$report_file"
     echo "Excluded Recommendations: $excluded_recommendations" >> "$report_file"
+    echo "Skipped Recommendations: $skipped_recommendations" >> "$report_file"
+    echo "Not Applicable Recommendations: $not_applicable_recommendations" >> "$report_file"
     echo "Passed Recommendations: $passed_recommendations" >> "$report_file"
     echo "Remediated Recommendations: $remediated_recommendations" >> "$report_file"
     echo "Manual Recommendations: $manual_recommendations" >> "$report_file"
@@ -169,7 +168,7 @@ generate_summary() {
 
 # List of all controls
 controls=(
-   "1.1.1" "1.1.2" "1.1.3" "1.1.4" "1.1.5" "1.1.6" "1.1.7" "1.1.8" "1.1.9" "1.1.10"
+    "1.1.1" "1.1.2" "1.1.3" "1.1.4" "1.1.5" "1.1.6" "1.1.7" "1.1.8" "1.1.9" "1.1.10"
     "1.1.11" "1.1.12" "1.1.13" "1.1.14" "1.1.15" "1.1.16" "1.1.17" "1.1.18"
     "1.2.1" "1.2.2" "2.1" "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "2.10" "2.11"
     "2.12" "2.13" "2.14" "2.15" "2.16" "2.17" "2.18" "3.1" "3.2" "3.3" "3.4" "3.5"
@@ -190,20 +189,6 @@ if [[ "$1" == "harden" ]]; then
         function_file="functions/hardening/function_${control//./_}.sh"
         run_control "$control" "$function_file" "$hardening_report_file"
     done
-
-    # Check if auditd needs to be restarted
-    if [[ -f /tmp/auditd_restart_required ]]; then
-        echo "Restarting auditd..."
-        systemctl restart auditd
-        rm /tmp/auditd_restart_required
-    fi
-
-    # Restart Docker if necessary
-    if [[ -f /tmp/docker_restart_required ]]; then
-        echo "Restarting Docker..."
-        systemctl restart docker
-        rm /tmp/docker_restart_required
-    fi
     
     generate_summary "$hardening_report_file"
     echo "Hardening report generated at: $hardening_report_file"
@@ -223,3 +208,4 @@ else
     generate_summary "$audit_report_file"
     echo "Audit report generated at: $audit_report_file"
 fi
+
