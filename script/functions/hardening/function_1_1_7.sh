@@ -14,8 +14,8 @@ harden_docker_service_auditing() {
         # Variable to track overall success
         overall_status=0
 
-        # Check if the audit rule already exists
-        if auditctl -l | grep -q -- "$audit_rule_definition"; then
+        # Check if the audit rule already exists in the current audit session
+        if auditctl -l | grep -q -- "$audit_rule"; then
             echo "Audit rule for Docker service file already exists."
         else
             # Add the audit rule to the current audit session
@@ -24,14 +24,19 @@ harden_docker_service_auditing() {
                 echo "Failed to add audit rule to the current audit session."
                 overall_status=1  # Set status to fail
             else
-                # Persist the audit rule by adding it to /etc/audit/rules.d/
-                if ! echo "$audit_rule_definition" >> "$audit_rules_file"; then
-                    echo "Failed to persist audit rule."
-                    overall_status=1  # Set status to fail
+                # Check if the rule already exists in the persistent file
+                if grep -q -- "$audit_rule_definition" "$audit_rules_file"; then
+                    echo "Audit rule is already persisted in $audit_rules_file."
                 else
-                    # Mark auditd for restart at the end of the hardening process
-                    echo "Audit rule for Docker service file added successfully. Auditd restart required."
-                    touch /tmp/auditd_restart_required
+                    # Persist the audit rule by adding it to /etc/audit/rules.d/
+                    if ! echo "$audit_rule_definition" >> "$audit_rules_file"; then
+                        echo "Failed to persist audit rule."
+                        overall_status=1  # Set status to fail
+                    else
+                        # Mark auditd for restart at the end of the hardening process
+                        echo "Audit rule for Docker service file added successfully. Auditd restart required."
+                        touch /tmp/auditd_restart_required
+                    fi
                 fi
             fi
         fi

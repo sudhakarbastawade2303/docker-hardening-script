@@ -5,7 +5,7 @@ ensure_audit_containerd_shim_runc_v2() {
     local audit_rules_file="/etc/audit/rules.d/audit.rules"
     
     # Audit rule line for /usr/bin/containerd-shim-runc-v2 file
-    local rule_containerd_shim_runc_v2="-w /usr/bin/containerd-shim-runc-v2 -p x -k docker"
+    local rule_containerd_shim_runc_v2="-w /usr/bin/containerd-shim-runc-v2 -p wa -k docker"
 
     # Check if the audit rule is already present
     if grep -q -- "$rule_containerd_shim_runc_v2" "$audit_rules_file"; then

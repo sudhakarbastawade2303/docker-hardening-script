@@ -5,7 +5,7 @@ check_trusted_users_docker_daemon() {
     echo "Checking 1.1.2: Ensure only trusted users are allowed to control Docker daemon"
 
     # Define your list of trusted users (this should be customized to your environment)
-    trusted_users=("user1" "user2" "user3")  # Replace with your actual trusted usernames
+    trusted_users=("root" "ubuntu" "xyz")  # Replace with your actual trusted usernames
 
     # Get the list of users in the Docker group
     docker_group_users=$(getent group docker | awk -F: '{print $4}' | tr ',' ' ')

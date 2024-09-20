@@ -5,7 +5,7 @@ ensure_audit_containerd() {
     local audit_rules_file="/etc/audit/rules.d/audit.rules"
     
     # Audit rule line for /usr/bin/containerd file
-    local rule_containerd="-w /usr/bin/containerd -p x -k docker"
+    local rule_containerd="-w /usr/bin/containerd -p wa -k docker"
 
     # Check if the audit rule is already present
     if grep -q -- "$rule_containerd" "$audit_rules_file"; then

@@ -5,7 +5,7 @@ ensure_audit_docker_service() {
     local audit_rules_file="/etc/audit/rules.d/audit.rules"
     
     # Audit rule line for docker.service file
-    local rule_docker_service="-w /lib/systemd/system/docker.service -p wa -k docker"
+    local rule_docker_service="-w /lib/systemd/system/docker.service -k docker"
 
     # Check if the audit rule is already present
     if grep -q -- "$rule_docker_service" "$audit_rules_file"; then

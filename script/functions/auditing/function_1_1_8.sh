@@ -13,7 +13,7 @@ ensure_audit_containerd_sock() {
         return 0
     else
         echo "FAIL: Audit rule for containerd.sock is not configured."
-        echo "NOTE: You need to add the following rule to $audit_rules_file:"
+        echo "NOTE: If file exist, then only add the rule to $audit_rules_file:"
         echo "$rule_containerd_sock"
         echo "After adding the rule, restart the Audit Daemon with: sudo systemctl restart auditd"
         return 1

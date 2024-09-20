@@ -13,7 +13,7 @@ ensure_audit_sysconfig_docker() {
         return 0
     else
         echo "FAIL: Audit rule for /etc/sysconfig/docker is not configured." 
-        echo "NOTE: You need to add the following rule to $audit_rules_file:"
+        echo "NOTE: If file exist then only add the following rule to $audit_rules_file:"
         echo "$rule_sysconfig_docker" 
         echo "After adding rule restart audit with: sudo systemctl restart auditd"
         return 1

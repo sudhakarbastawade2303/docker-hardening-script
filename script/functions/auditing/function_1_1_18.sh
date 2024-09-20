@@ -5,7 +5,7 @@ ensure_audit_runc() {
     local audit_rules_file="/etc/audit/rules.d/audit.rules"
     
     # Audit rule line for /usr/bin/runc file
-    local rule_runc="-w /usr/bin/runc -p x -k docker"
+    local rule_runc="-w /usr/bin/runc -p wa -k docker"
 
     # Check if the audit rule is already present
     if grep -q -- "$rule_runc" "$audit_rules_file"; then

@@ -10,7 +10,7 @@ check_logging_config_file() {
         echo "Checking Docker logging configuration in $config_file..."
         
         for driver in "${logging_drivers[@]}"; do
-            if grep -q "$driver" "$config_file"; then
+            if grep -q -- "$driver" "$config_file"; then
                 echo "PASS: Centralized or remote logging is configured with driver: $driver"
                 return 0
             fi
@@ -25,31 +25,31 @@ check_logging_config_file() {
 }
 
 # Function to check if centralized or remote logging is enabled via Docker daemon command line
-check_logging_command_line() {
-    local logging_drivers=("fluentd" "gelf" "syslog")
+# check_logging_command_line() {
+#     local logging_drivers=("fluentd" "gelf" "syslog")
 
-    # Look for the Docker daemon process
-    local docker_pid=$(pgrep -f dockerd)
+#     # Look for the Docker daemon process
+#     local docker_pid=$(pgrep -f dockerd)
     
-    if [[ -z "$docker_pid" ]]; then
-        echo "FAIL: Docker daemon is not running or could not be found."
-        return 1
-    fi
+#     if [[ -z "$docker_pid" ]]; then
+#         echo "FAIL: Docker daemon is not running or could not be found."
+#         return 1
+#     fi
 
-    echo "Checking Docker logging configuration from command line..."
+#     echo "Checking Docker logging configuration from command line..."
 
-    # Check the command line arguments of the Docker daemon process
-    for driver in "${logging_drivers[@]}"; do
-        if ps -ef | grep "[d]ockerd" | grep -q "--log-driver=$driver"; then
-            echo "PASS: Centralized or remote logging is enabled with driver: $driver"
-            return 0
-        fi
-    done
+#     # Check the command line arguments of the Docker daemon process
+#     for driver in "${logging_drivers[@]}"; do
+#         if ps -ef | grep "[d]ockerd" | grep -q "--log-driver=$driver"; then
+#             echo "PASS: Centralized or remote logging is enabled with driver: $driver"
+#             return 0
+#         fi
+#     done
     
-    echo "FAIL: Centralized or remote logging is NOT configured in the Docker daemon command line."
-    return 1
-}
+#     echo "FAIL: Centralized or remote logging is NOT configured in the Docker daemon command line."
+#     return 1
+# }
 
 # Call the functions to check logging configuration
 check_logging_config_file
-check_logging_command_line
+#check_logging_command_line

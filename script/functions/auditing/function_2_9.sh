@@ -10,7 +10,7 @@ check_user_namespace() {
     if [[ -f "$config_file" ]]; then
         # Look for the userns-remap option in the Docker config file
         if grep -q '"userns-remap"' "$config_file"; then
-            echo "User namespace support is configured."
+            echo "Default User namespace support is configured. Consideration should be given to implementing this in line with requirements of application and organisation policy"
         else
             echo "WARNING: User namespace support is NOT configured in $config_file."
             status=1
