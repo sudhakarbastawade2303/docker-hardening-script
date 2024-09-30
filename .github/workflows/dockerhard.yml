@@ -13,7 +13,7 @@ jobs:
 
       - name: Create ZIP of the script folder
         run: |
-          zip -r script.zip ./docker-hardening-script/script
+          zip -r script.zip ./script
 
       - name: Upload to Nexus
         run: |
