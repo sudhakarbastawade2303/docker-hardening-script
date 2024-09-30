@@ -1,0 +1,20 @@
+name: Upload to Nexus Manually
+
+on:
+  workflow_dispatch:  # Allows manual triggering from the Actions tab
+
+jobs:
+  nexus-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create ZIP of the script folder
+        run: |
+          zip -r script.zip ./docker-hardening-script/script
+
+      - name: Upload to Nexus
+        run: |
+          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file script.zip http://13.233.130.147:8081/repository/docker_hardening_script/script.zip
