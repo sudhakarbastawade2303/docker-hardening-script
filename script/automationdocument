@@ -1,0 +1,96 @@
+schemaVersion: '0.3'
+description: Docker Hardening and Validation Script from GitHub
+assumeRole: '{{ automationAssumeRole }}'
+parameters:
+  automationAssumeRole:
+    type: String
+    description: (Optional) The ARN of the role that allows Automation to perform actions on your behalf.
+    default: ''
+  instanceIds:
+    type: StringList
+    description: List of EC2 instance IDs where the script will be executed.
+  gitHubRepoUrl:
+    type: String
+    description: The GitHub URL of the repository.
+    default: https://github.com/sudhakarbastawade2303/docker-hardening-script.git
+mainSteps:
+  - name: InstallGit
+    action: aws:runCommand
+    timeoutSeconds: 300
+    nextStep: RemoveExistingDirectory
+    isEnd: false
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds:
+        - i-0e22ac3601e62a932
+      Parameters:
+        commands:
+          - sudo yum install -y git
+  - name: RemoveExistingDirectory
+    action: aws:runCommand
+    timeoutSeconds: 300
+    nextStep: DownloadScriptFromGitHub
+    isEnd: false
+    onFailure: step:DownloadScriptFromGitHub
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds:
+        - i-0e22ac3601e62a932
+      Parameters:
+        commands:
+          - if [ -d "docker-hardening-script" ]; then sudo rm -rf docker-hardening-script; fi
+  - name: DownloadScriptFromGitHub
+    action: aws:runCommand
+    timeoutSeconds: 300
+    nextStep: ExecuteHardeningScript
+    isEnd: false
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds:
+        - i-0e22ac3601e62a932
+      Parameters:
+        commands:
+          - git clone "{{ gitHubRepoUrl }}"
+          - cd docker-hardening-script
+          - sudo chmod +x script/main-script.sh
+  - name: ExecuteHardeningScript
+    action: aws:runCommand
+    timeoutSeconds: 600
+    nextStep: GenerateReport
+    isEnd: false
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds:
+        - i-0e22ac3601e62a932
+      Parameters:
+        commands:
+          - cd docker-hardening-script/script
+          - ./main-script.sh
+  - name: GenerateReport
+    action: aws:runCommand
+    timeoutSeconds: 300
+    nextStep: NotifyCompletion
+    isEnd: false
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds:
+        - i-0e22ac3601e62a932
+      Parameters:
+        commands:
+          - cat /home/ec2-user/output/audit_report.txt
+  - name: NotifyCompletion
+    action: aws:runCommand
+    timeoutSeconds: 300
+    isEnd: true
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds:
+        - i-0e22ac3601e62a932
+      Parameters:
+        commands:
+          - echo "Docker Hardening Process Complete"
+

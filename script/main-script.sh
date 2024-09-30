@@ -14,8 +14,8 @@ audit_date=$(date '+%Y-%m-%d %H:%M:%S')
 server_name=$(hostname)
 
 # File paths for reports
-audit_report_file="audit_report.txt"
-hardening_report_file="hardening_report.txt"
+audit_report_file="/home/ec2-user/output/audit_report.txt"
+hardening_report_file="/home/ec2-user/output/hardening_report.txt"
 
 # Load the exclusion list into an array
 exclusions=()
