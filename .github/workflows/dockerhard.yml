@@ -23,7 +23,7 @@ jobs:
 
       - name: Upload to Nexus
         run: |
-          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_$(date +%Y%m%d%H%M%S).zip" http://13.201.10.253:8081/repository/docker_hardening_script/
+          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_$(date +%Y%m%d%H%M%S).zip" http://13.201.10.253:8081/repository/docker-hardening-script/
 
 
 
