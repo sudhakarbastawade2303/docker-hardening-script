@@ -1,10 +1,12 @@
-name: Upload to Nexus Manually
+name: Upload to Nexus on PR Approval
 
 on:
-  workflow_dispatch:  # Allows manual triggering from the Actions tab
+  pull_request:
+    types: [closed]  # Run when PR is closed
 
 jobs:
   nexus-upload:
+    if: github.event.pull_request.merged == true  # Only run if the PR is merged
     runs-on: ubuntu-latest
 
     steps:
@@ -17,4 +19,4 @@ jobs:
 
       - name: Upload to Nexus
         run: |
-          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file script.zip http://13.233.130.147:8081/repository/docker_hardening_script/script.zip
+          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file script.zip http://13.201.10.253:8081/repository/docker_hardening_script/script.zip
