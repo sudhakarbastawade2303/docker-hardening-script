@@ -98,7 +98,6 @@ mainSteps:
     Parameters:
       commands:
       - echo "Docker Hardening Process Complete"
-#testing
 
 
 
