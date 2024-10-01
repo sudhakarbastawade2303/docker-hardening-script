@@ -1,0 +1,101 @@
+schemaVersion: '0.3'
+description: Docker Hardening and Validation Script from Nexus
+assumeRole: '{{ automationAssumeRole }}'
+parameters:
+  automationAssumeRole:
+    type: String
+    description: "(Optional) The ARN of the role that allows Automation to perform actions on your behalf."
+    default: ''
+  instanceIds:
+    type: StringList
+    description: "List of EC2 instance IDs where the script will be executed."
+  nexusRepoUrl:
+    type: String
+    description: "The Nexus repository URL to download the script."
+    default: "http://13.201.10.253:8081/repository/docker_hardening_script/script.zip"
+mainSteps:
+- name: InstallDependencies
+  action: aws:runCommand
+  timeoutSeconds: 300
+  nextStep: RemoveExistingDirectory
+  isEnd: false
+  onFailure: Abort
+  inputs:
+    DocumentName: AWS-RunShellScript
+    InstanceIds: "{{ instanceIds }}"
+    Parameters:
+      commands:
+      - sudo yum install -y curl tar gzip
+- name: RemoveExistingDirectory
+  action: aws:runCommand
+  timeoutSeconds: 300
+  nextStep: DownloadScriptFromNexus
+  isEnd: false
+  onFailure: step:DownloadScriptFromNexus
+  inputs:
+    DocumentName: AWS-RunShellScript
+    InstanceIds: "{{ instanceIds }}"
+    Parameters:
+      commands:
+      - if [ -d "docker-hardening-script" ]; then sudo rm -rf docker-hardening-script; fi
+- name: DownloadScriptFromNexus
+  action: aws:runCommand
+  timeoutSeconds: 300
+  nextStep: ExtractScript
+  isEnd: false
+  onFailure: Abort
+  inputs:
+    DocumentName: AWS-RunShellScript
+    InstanceIds: "{{ instanceIds }}"
+    Parameters:
+      commands:
+      - curl -O "{{ nexusRepoUrl }}"
+- name: ExtractScript
+  action: aws:runCommand
+  timeoutSeconds: 300
+  nextStep: ExecuteHardeningScript
+  isEnd: false
+  onFailure: Abort
+  inputs:
+    DocumentName: AWS-RunShellScript
+    InstanceIds: "{{ instanceIds }}"
+    Parameters:
+      commands:
+      - tar -xzf docker-hardening-script.tar.gz
+      - sudo chmod +x docker-hardening-script/script/main-script.sh
+- name: ExecuteHardeningScript
+  action: aws:runCommand
+  timeoutSeconds: 600
+  nextStep: GenerateReport
+  isEnd: false
+  onFailure: Abort
+  inputs:
+    DocumentName: AWS-RunShellScript
+    InstanceIds: "{{ instanceIds }}"
+    Parameters:
+      commands:
+      - cd docker-hardening-script/script
+      - ./main-script.sh
+- name: GenerateReport
+  action: aws:runCommand
+  timeoutSeconds: 300
+  nextStep: NotifyCompletion
+  isEnd: false
+  onFailure: Abort
+  inputs:
+    DocumentName: AWS-RunShellScript
+    InstanceIds: "{{ instanceIds }}"
+    Parameters:
+      commands:
+      - cat /home/ec2-user/output/audit_report.txt
+- name: NotifyCompletion
+  action: aws:runCommand
+  timeoutSeconds: 300
+  isEnd: true
+  inputs:
+    DocumentName: AWS-RunShellScript
+    InstanceIds: "{{ instanceIds }}"
+    Parameters:
+      commands:
+      - echo "Docker Hardening Process Complete"
+
