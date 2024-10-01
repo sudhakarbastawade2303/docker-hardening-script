@@ -17,6 +17,13 @@ jobs:
         run: |
           zip -r script.zip ./script
 
+      - name: Append commit hash to ZIP file
+        run: |
+          commit_hash=$(git rev-parse --short HEAD)
+          mv script.zip "script_${commit_hash}.zip"
+
       - name: Upload to Nexus
         run: |
-          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file script.zip http://13.201.10.253:8081/repository/docker_hardening_script/script.zip
+          commit_hash=$(git rev-parse --short HEAD)
+          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_${commit_hash}.zip" http://13.233.130.147:8081/repository/docker_hardening_script/
+
