@@ -25,5 +25,5 @@ jobs:
       - name: Upload to Nexus
         run: |
           commit_hash=$(git rev-parse --short HEAD)
-          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_${commit_hash}.zip" http://13.233.130.147:8081/repository/docker_hardening_script/
+          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_${commit_hash}.zip" http://13.201.10.253:8081/repository/docker_hardening_script/
 
