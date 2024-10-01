@@ -1,4 +1,4 @@
-name: Upload to Nexus on PR Approval
+name: Upload to Nexus Manually
 
 on:
   pull_request:
@@ -17,13 +17,13 @@ jobs:
         run: |
           zip -r script.zip ./script
 
-      - name: Append commit hash to ZIP file
+      - name: Append timestamp to ZIP file
         run: |
-          commit_hash=$(git rev-parse --short HEAD)
-          mv script.zip "script_${commit_hash}.zip"
+          mv script.zip "script_$(date +%Y%m%d%H%M%S).zip"
 
       - name: Upload to Nexus
         run: |
-          commit_hash=$(git rev-parse --short HEAD)
-          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_${commit_hash}.zip" http://13.201.10.253:8081/repository/docker_hardening_script/
+          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_$(date +%Y%m%d%H%M%S).zip" http://13.201.10.253:8081/repository/docker_hardening_script/
+
+
 
