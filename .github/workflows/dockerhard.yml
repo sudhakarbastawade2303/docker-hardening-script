@@ -13,17 +13,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set Environment Variables
+        run: |
+          echo "TIMESTAMP=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+          echo "NEXUS_URL=http://13.201.10.253:8081/repository/docker-hardening-script/" >> $GITHUB_ENV
+
       - name: Create ZIP of the script folder
         run: |
           zip -r script.zip ./script
 
       - name: Append timestamp to ZIP file
         run: |
-          mv script.zip "script_$(date +%Y%m%d%H%M%S).zip"
+          mv script.zip "script_${TIMESTAMP}.zip"
 
       - name: Upload to Nexus
         run: |
-          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_$(date +%Y%m%d%H%M%S).zip" http://13.201.10.253:8081/repository/docker-hardening-script/
-
-
-
+          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script_${TIMESTAMP}.zip" $NEXUS_URL
