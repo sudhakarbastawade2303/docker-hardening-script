@@ -1,0 +1,26 @@
+name: Upload to Nexus Manually
+
+on:
+  pull_request:
+    types: [closed]  # Run when PR is closed
+
+jobs:
+  nexus-upload:
+    if: github.event.pull_request.merged == true  # Only run if the PR is merged
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set Environment Variables
+        run: |
+          echo "NEXUS_URL=http://13.201.10.253:8081/repository/docker-hardening-script/" >> $GITHUB_ENV
+
+      - name: Create ZIP of the script folder
+        run: |
+          zip -r script.zip ./script
+
+      - name: Upload to Nexus
+        run: |
+          curl -v -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} --upload-file "script.zip" $NEXUS_URL
