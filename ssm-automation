@@ -14,72 +14,90 @@ parameters:
     description: The Nexus repository URL for the script.
     default: http://13.201.10.253:8081/repository/docker-hardening-script/
 mainSteps:
-- name: InstallDependencies
-  action: aws:runCommand
-  timeoutSeconds: 300
-  nextStep: DownloadScript
-  isEnd: false
-  onFailure: Abort
-  inputs:
-    DocumentName: AWS-RunShellScript
-    InstanceIds: '{{ instanceIds }}'
-    Parameters:
-      commands:
-      - echo "Checking for unzip installation..."
-      - |
-        if ! command -v unzip &> /dev/null; then
-          echo "unzip not found. Installing unzip...";
-          sudo yum install -y unzip;
-        else
-          echo "unzip is already installed.";
-        fi
-      - sudo yum install -y aws-cli
-- name: DownloadScript
-  action: aws:runCommand
-  timeoutSeconds: 600
-  nextStep: UnzipScript
-  isEnd: false
-  onFailure: Abort
-  inputs:
-    DocumentName: AWS-RunShellScript
-    InstanceIds: '{{ instanceIds }}'
-    Parameters:
-      commands:
-      - cd /tmp
-      - echo "Retrieving Nexus credentials from Parameter Store..."
-      - |
-        NEXUS_USERNAME=$(aws ssm get-parameter --name "/nexus/username" --query "Parameter.Value" --output text)
-        NEXUS_PASSWORD=$(aws ssm get-parameter --name "/nexus/password" --query "Parameter.Value" --output text)
-      - echo "Downloading script.zip from Nexus..."
-      - curl -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" -O "{{ nexusRepoUrl }}script.zip"
-- name: UnzipScript
-  action: aws:runCommand
-  timeoutSeconds: 300
-  nextStep: RunMainScript
-  isEnd: false
-  onFailure: Abort
-  inputs:
-    DocumentName: AWS-RunShellScript
-    InstanceIds: '{{ instanceIds }}'
-    Parameters:
-      commands:
-      - echo "Checking if script.zip exists..."
-      - "if [ -f /tmp/script.zip ]; then\n  echo \"Unzipping the downloaded script...\";\n  mkdir -p /tmp/docker-hardening-script;  # Create directory if it doesn't exist\n  unzip -o /tmp/script.zip -d /tmp/docker-hardening-script && echo \"Script unzipped successfully.\" || echo \"Failed to unzip script.zip.\";\nelse\n  echo \"script.zip not found!\"; \n  exit 1;\nfi\n"
-- name: RunMainScript
-  action: aws:runCommand
-  timeoutSeconds: 600
-  isEnd: true
-  onFailure: Abort
-  inputs:
-    DocumentName: AWS-RunShellScript
-    InstanceIds: '{{ instanceIds }}'
-    Parameters:
-      commands:
-      - echo "Creating reports directory..."
-      - mkdir -p /tmp/reports
-      - echo "Running main-script.sh..."
-      - cd /tmp/docker-hardening-script/script
-      - chmod +x main-script.sh
-      - sudo ./main-script.sh > /tmp/reports/report.txt
-      - echo "Report generated at /tmp/reports/report.txt."
+  - name: InstallDependencies
+    action: aws:runCommand
+    timeoutSeconds: 300
+    nextStep: DownloadScript
+    isEnd: false
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds: '{{ instanceIds }}'
+      Parameters:
+        commands:
+        - echo "Checking for unzip installation..."
+        - |
+          if ! command -v unzip &> /dev/null; then
+            echo "unzip not found. Installing unzip...";
+            sudo yum install -y unzip;
+          else
+            echo "unzip is already installed.";
+          fi
 
+  - name: DownloadScript
+    action: aws:runCommand
+    timeoutSeconds: 600
+    nextStep: UnzipScript
+    isEnd: false
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds: '{{ instanceIds }}'
+      Parameters:
+        commands:
+        - cd /opt  # Use /opt as it is a standard location for system-managed files
+        - echo "Downloading script.zip from Nexus..."
+        - curl -O "{{ nexusRepoUrl }}script.zip"
+        
+  - name: UnzipScript
+    action: aws:runCommand
+    timeoutSeconds: 300
+    nextStep: RunMainScript
+    isEnd: false
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds: '{{ instanceIds }}'
+      Parameters:
+        commands:
+        - echo "Checking if script.zip exists..."
+        - |
+          if [ -f /opt/script.zip ]; then
+            echo "Unzipping the downloaded script...";
+            mkdir -p /opt/docker-hardening-script  # Create directory if it doesn't exist
+            unzip -o /opt/script.zip -d /opt/docker-hardening-script && echo "Script unzipped successfully." || echo "Failed to unzip script.zip.";
+          else
+            echo "script.zip not found!";
+            exit 1;
+          fi
+
+  - name: RunMainScript
+    action: aws:runCommand
+    timeoutSeconds: 600
+    nextStep: CleanUp
+    isEnd: false
+    onFailure: Abort
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds: '{{ instanceIds }}'
+      Parameters:
+        commands:
+        - echo "Running main-script.sh..."
+        - cd /opt/docker-hardening-script/script
+        - chmod +x main-script.sh
+        - sudo ./main-script.sh | tee /opt/docker-hardening-script/report.txt  # Output the report to both STDOUT and a file
+        - echo "Report generated and output to /opt/docker-hardening-script/report.txt."
+
+  - name: CleanUp
+    action: aws:runCommand
+    timeoutSeconds: 300
+    isEnd: true
+    onFailure: Continue
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds: '{{ instanceIds }}'
+      Parameters:
+        commands:
+        - echo "Deleting downloaded script files..."
+        - rm -rf /opt/docker-hardening-script /opt/script.zip
+        - echo "Cleanup complete."
