@@ -15,7 +15,7 @@ jobs:
 
       - name: Set Environment Variables
         run: |
-          echo "NEXUS_URL=http://13.201.10.253:8081/repository/docker-hardening-script/" >> $GITHUB_ENV
+          echo "NEXUS_URL=http://15.206.100.229:8081/repository/docker-hardening-script/" >> $GITHUB_ENV
 
       - name: Create ZIP of the script folder
         run: |
